@@ -65,8 +65,8 @@ paths:
         - User Module
       summary: User Profile API
       description: API for fetching a user profile
-      #produces:
-       # - application/json
+      produces:
+        - application/json
       responses:
         '200':
           description: User profile retrieved successully
@@ -101,11 +101,204 @@ paths:
           description: Invalid Fields
         '500':
           description: Internal Server Error
+  /accounts:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - Account Module
+      summary: User Accounts API
+      description: API for fetching all accounts of the authenticated user
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Accounts retrieved successfully
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              message:
+                type: string
+              body:
+                type: array
+                items:
+                  $ref: '#/definitions/Account'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+          
+  /accounts/{accountId}/transactions:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - Transaction Module
+      summary: Account Transactions API
+      description: API for fetching all transactions of a specific account for the current month
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          type: string
+          description: ID of the account
+        - in: query
+          name: month
+          required: false
+          type: string
+          description: Month to filter transactions (format YYYY-MM, defaults to current month)
+        - in: query
+          name: page
+          required: false
+          type: integer
+          description: Page number for pagination (defaults to 1)
+        - in: query
+          name: limit
+          required: false
+          type: integer
+          description: Number of transactions per page (defaults to 10)
+        - in: query
+          name: sort
+          required: false
+          type: string
+          description: Sort field (date, amount, description)
+        - in: query
+          name: order
+          required: false
+          type: string
+          enum: [asc, desc]
+          description: Sort order (asc or desc)
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Transactions retrieved successfully
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              message:
+                type: string
+              body:
+                type: object
+                properties:
+                  transactions:
+                    type: array
+                    items:
+                      $ref: '#/definitions/Transaction'
+                  pagination:
+                    type: object
+                    properties:
+                      currentPage:
+                        type: integer
+                      totalPages:
+                        type: integer
+                      totalItems:
+                        type: integer
+                      itemsPerPage:
+                        type: integer
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - User does not own this account
+        '404':
+          description: Account not found
+        '500':
+          description: Internal Server Error
+          
+  /transactions/{transactionId}:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - Transaction Module
+      summary: Transaction Details API
+      description: API for fetching details of a specific transaction
+      parameters:
+        - in: path
+          name: transactionId
+          required: true
+          type: string
+          description: ID of the transaction
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Transaction details retrieved successfully
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+              message:
+                type: string
+              body:
+                $ref: '#/definitions/Transaction'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - User does not own this transaction
+        '404':
+          description: Transaction not found
+        '500':
+          description: Internal Server Error
+          
+    patch:
+      security:
+        - Bearer: []
+      tags:
+        - Transaction Module
+      summary: Update Transaction API
+      description: API for updating information of a specific transaction
+      parameters:
+        - in: path
+          name: transactionId
+          required: true
+          type: string
+          description: ID of the transaction
+        - in: body
+          name: body
+          description: Transaction information to update
+          required: true
+          schema:
+            type: object
+            properties:
+              category:
+                type: string
+                description: Category to assign to the transaction
+              notes:
+                type: string
+                description: Notes to add to the transaction
+              description:
+                type: string
+                description: Updated description for the transaction
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Transaction updated successfully
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        '400':
+          description: Invalid fields
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - User does not own this transaction
+        '404':
+          description: Transaction not found
+        '500':
+          description: Internal Server Error
+
 securityDefinitions:
   Bearer:
     type: apiKey
     name: Authorization
     in: header
+
 definitions:
   User:
     properties:
@@ -156,3 +349,59 @@ definitions:
     properties:
       userName:
         type: string
+  Account:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Account ID
+      userId:
+        type: string
+        description: User ID who owns this account
+      accountType:
+        type: string
+        description: Type of account (e.g., Checking, Savings)
+      accountName:
+        type: string
+        description: Account name
+      balance:
+        type: number
+        format: float
+        description: Current balance
+      currency:
+        type: string
+        description: Currency code (e.g., USD, EUR)
+      createdAt:
+        type: string
+        format: date-time
+        description: Account creation date
+  Transaction:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Transaction ID
+      accountId:
+        type: string
+        description: Associated account ID
+      date:
+        type: string
+        format: date-time
+        description: Transaction date
+      description:
+        type: string
+        description: Transaction description
+      amount:
+        type: number
+        format: float
+        description: Transaction amount
+      type:
+        type: string
+        enum: [credit, debit]
+        description: Transaction type
+      category:
+        type: string
+        description: Transaction category
+      notes:
+        type: string
+        description: User notes about the transaction
