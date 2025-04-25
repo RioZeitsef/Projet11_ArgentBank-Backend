@@ -330,78 +330,84 @@ definitions:
     properties:
       status:
         type: integer
+        description: HTTP status
       message:
         type: string
+        description: response message
       body:
         type: object
         properties:
           id:
             type: string
+            description: user id
           email:
             type: string
+            description: user email
   LoginResponse:
     type: object
     properties:
       token:
         type: string
+        description: Bearer token
   UserProfile:
     type: object
     properties:
       userName:
         type: string
+        description: user public name
   Account:
     type: object
     properties:
       id:
         type: string
-        description: Account ID
+        description: account id
       userId:
         type: string
-        description: User ID who owns this account
+        description: user id who owns this account
       accountType:
         type: string
-        description: Type of account (e.g., Checking, Savings)
+        description: type of account (e.g., Checking, Savings)
       accountName:
         type: string
-        description: Account name
+        description: account name
       balance:
         type: number
         format: float
-        description: Current balance
+        description: current balance
       currency:
         type: string
-        description: Currency code (e.g., USD, EUR)
+        description: currency code (e.g., USD, EUR)
       createdAt:
         type: string
         format: date-time
-        description: Account creation date
+        description: account creation date
   Transaction:
     type: object
     properties:
       id:
         type: string
-        description: Transaction ID
+        description: transaction id
       accountId:
         type: string
-        description: Associated account ID
+        description: associated account id
       date:
         type: string
         format: date-time
-        description: Transaction date
+        description: transaction date
       description:
         type: string
-        description: Transaction description
+        description: transaction description
       amount:
         type: number
         format: float
-        description: Transaction amount
+        description: transaction amount
       type:
         type: string
         enum: [credit, debit]
-        description: Transaction type
+        description: transaction type
       category:
         type: string
-        description: Transaction category
+        description: transaction category
       notes:
         type: string
-        description: User notes about the transaction
+        description: user notes about the transaction
