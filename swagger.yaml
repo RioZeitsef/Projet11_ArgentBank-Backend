@@ -150,16 +150,6 @@ paths:
           type: string
           description: Month to filter transactions (format YYYY-MM, defaults to current month)
         - in: query
-          name: page
-          required: false
-          type: integer
-          description: Page number for pagination (defaults to 1)
-        - in: query
-          name: limit
-          required: false
-          type: integer
-          description: Number of transactions per page (defaults to 10)
-        - in: query
           name: sort
           required: false
           type: string
@@ -292,6 +282,35 @@ paths:
           description: Transaction not found
         '500':
           description: Internal Server Error
+          
+    delete:
+      security:
+        - Bearer: []
+      tags:
+        - Transaction Module
+      summary: Reset Transaction Modifications API
+      description: API for removing custom modifications (category, notes, custom description) from a transaction
+      parameters:
+        - in: path
+          name: transactionId
+          required: true
+          type: string
+          description: ID of the transaction
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Transaction modifications cleared successfully
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - User does not own this transaction
+        '404':
+          description: Transaction not found
+        '500':
+          description: Internal Server Error      
 
 securityDefinitions:
   Bearer:
